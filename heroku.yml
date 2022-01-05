@@ -3,4 +3,4 @@ build:
     with: Dockerfile
 
 run:
-  web: ./klv
+  web: ./app
