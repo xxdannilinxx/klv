@@ -4,3 +4,4 @@ build:
 
 run:
   web: ./app
+  image: klv_app
