@@ -4,6 +4,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/alexflint/go-arg"
 )
 
 // Struct
@@ -20,12 +22,32 @@ func (c Crypto) Create() {
 
 }
 
+type config struct {
+	PORT         string `arg:"env:PORT, -P, --PORT" help:"Port of the application" placeholder:"PORT"`
+	DATABASE_URL string `arg:"env:DATABASE_URL, -D, --DATABASE_URL" help:"Connection with database" placeholder:"DATABASE_URL"`
+}
+
+var Config config
+
 // funcao main
 func main() {
+	arg.MustParse(&Config)
+
+	println("Servidor online na porta", Config.PORT)
+	println("Configuração de conexão com o postgre", Config.DATABASE_URL)
+
+	http.HandleFunc("/", HomeHandle)
 	http.HandleFunc("/hello", HelloHandle)
 	http.HandleFunc("/cryptos", CryptoHandler)
-	http.ListenAndServe(":8080", nil)
-	print("Servidor online")
+
+	if err := http.ListenAndServe(":"+Config.PORT, nil); err != nil {
+		println("ListenAndServe: ", err)
+	}
+}
+
+// teste
+func HomeHandle(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Início")
 }
 
 // teste

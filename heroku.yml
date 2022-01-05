@@ -1,7 +1,0 @@
-build:
-  docker:
-    with: Dockerfile
-
-run:
-  web: ./app
-  image: klv_app
