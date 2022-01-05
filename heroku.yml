@@ -1,3 +1,6 @@
 build:
   docker:
     with: Dockerfile
+
+run:
+  web: ./klv
