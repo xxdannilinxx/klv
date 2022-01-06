@@ -3,7 +3,7 @@ app test for klv;
 
 # run project
 ``$ go mod vendor``
-``$ go run cmd/app/main.go --PORT 8080``
+``$ go run ./main.go --PORT 8080``
 # run tests coverage
 ``$ go test -cover -coverprofile=c.out ./...``
 
