@@ -3,5 +3,12 @@
 github.com/alexflint/go-arg
 # github.com/alexflint/go-scalar v1.0.0
 github.com/alexflint/go-scalar
+# github.com/sirupsen/logrus v1.8.1
+## explicit
+github.com/sirupsen/logrus
+# golang.org/x/sys v0.0.0-20211019181941-9d821ace8654
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+golang.org/x/sys/windows
 # golang.org/x/tools v0.1.8
 ## explicit

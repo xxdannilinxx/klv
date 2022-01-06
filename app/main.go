@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/alexflint/go-arg"
+	"github.com/sirupsen/logrus"
 )
 
 // Struct
@@ -33,15 +34,14 @@ var Config config
 func main() {
 	arg.MustParse(&Config)
 
-	println("Servidor online na porta", Config.PORT)
-	println("Configuração de conexão com o postgre", Config.DATABASE_URL)
+	logrus.Info("Server online in port ", Config.PORT)
 
 	http.HandleFunc("/", HomeHandle)
 	http.HandleFunc("/hello", HelloHandle)
 	http.HandleFunc("/cryptos", CryptoHandler)
 
 	if err := http.ListenAndServe(":"+Config.PORT, nil); err != nil {
-		println("ListenAndServe: ", err)
+		logrus.Error("ListenAndServe: ", err)
 	}
 }
 
