@@ -3,42 +3,85 @@ package currency
 import (
 	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
-type CurrencysHandler struct{}
-
-func (c *CurrencysHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		c.getCurrency(w, r)
-	case http.MethodPost:
-		c.addCurrency(w, r)
-	case http.MethodPut:
-		c.updateCurrency(w, r)
-	case http.MethodDelete:
-		c.deleteCurrency(w, r)
-	default:
-		log.Println("[CURRENCY] " + r.Method + " - method not allowed")
-		http.Error(w, "404 page not found", http.StatusNotFound)
-	}
+type CurrencyHandler struct {
+	l       *log.Logger
+	service *CurrencyService
 }
 
-func (c *CurrencysHandler) getCurrency(w http.ResponseWriter, r *http.Request) {
-	log.Println("[CURRENCY] GET - currency by id")
+func Handlers(l *log.Logger) *CurrencyHandler {
+	return &CurrencyHandler{l, &CurrencyService{}}
+}
+
+func (c *CurrencyHandler) GetCurrency(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		c.l.Println("[CURRENCY] ERROR ", err)
+		http.Error(w, "[CURRENCY] Unable to convert id", http.StatusBadRequest)
+		return
+	}
+	c.l.Println("[CURRENCY] GET - currency by id ", id)
 	w.Write([]byte("get currency"))
 }
 
-func (c *CurrencysHandler) addCurrency(w http.ResponseWriter, r *http.Request) {
-	log.Println("[CURRENCY] POST - add currency")
+func (c *CurrencyHandler) AddCurrency(w http.ResponseWriter, r *http.Request) {
+	c.l.Println("[CURRENCY] POST - add currency")
 	w.Write([]byte("add currency"))
 }
 
-func (c *CurrencysHandler) updateCurrency(w http.ResponseWriter, r *http.Request) {
-	log.Println("[CURRENCY] PUT - update currency")
+func (c *CurrencyHandler) UpdateCurrency(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		c.l.Println("[CURRENCY] ERROR ", err)
+		http.Error(w, "[CURRENCY] Unable to convert id", http.StatusBadRequest)
+		return
+	}
+	c.l.Println("[CURRENCY] PUT - update currency ", id)
 	w.Write([]byte("add currency"))
 }
 
-func (c *CurrencysHandler) deleteCurrency(w http.ResponseWriter, r *http.Request) {
-	log.Println("[CURRENCY] DELETE - delete currency")
-	w.Write([]byte("add currency"))
+// testes
+// adicionar comentários
+// grpc
+// os serviços vao ficar em services
+// criar dto
+func (c *CurrencyHandler) DeleteCurrency(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		c.l.Println("[CURRENCY] ERROR ", err)
+		http.Error(w, "[CURRENCY] Unable to convert id", http.StatusBadRequest)
+		return
+	}
+	c.l.Println("[CURRENCY] DELETE - delete currency ", id)
+	del := c.service.delete(1)
+	w.Write([]byte(del))
+}
+
+func (c *CurrencyHandler) MiddlewareValidationCurrency(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cur := &Currency{}
+
+		err := cur.Unmarshal(r.Body)
+		if err != nil {
+			c.l.Println("[CURRENCY] ERROR ", err)
+			http.Error(w, "[CURRENCY] Error reading currency", http.StatusBadRequest)
+			return
+		}
+
+		err = cur.Validate()
+		if err != nil {
+			c.l.Println("[CURRENCY] ERROR ", err)
+			http.Error(w, "[CURRENCY] Error validate currency: ", http.StatusBadRequest)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

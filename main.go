@@ -3,25 +3,43 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/alexflint/go-arg"
+	"github.com/gorilla/mux"
 	"github.com/xxdannilinxx/klv/currency"
 )
 
 type config struct {
-	PORT         string `arg:"env:PORT, -P, --PORT" help:"Port of the application" placeholder:"PORT"`
-	DATABASE_URL string `arg:"env:DATABASE_URL, -D, --DATABASE_URL" help:"Connection with database" placeholder:"DATABASE_URL"`
+	PORT         string
+	DATABASE_URL string
 }
 
 var Config config
 
 func main() {
-	arg.MustParse(&Config)
+	Config.PORT = os.Getenv("PORT")
+	Config.DATABASE_URL = os.Getenv("DATABASE_URL")
 
-	log.Println("[MAIN] Server online in port " + Config.PORT + ".")
+	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
 
-	mux := http.NewServeMux()
-	mux.Handle("/currency", &currency.CurrencysHandler{})
+	l.Println("[MAIN] Server online in port " + Config.PORT + ".")
 
-	log.Fatal(http.ListenAndServe(":"+Config.PORT, mux))
+	ch := currency.Handlers(l)
+	sm := mux.NewRouter()
+
+	getRouter := sm.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/{id:[0-9]+}", ch.GetCurrency)
+
+	postRouter := sm.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/", ch.AddCurrency)
+	postRouter.Use(ch.MiddlewareValidationCurrency)
+
+	putRouter := sm.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", ch.UpdateCurrency)
+	putRouter.Use(ch.MiddlewareValidationCurrency)
+
+	deleteRouter := sm.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/{id:[0-9]+}", ch.DeleteCurrency)
+
+	log.Fatal(http.ListenAndServe(":"+Config.PORT, sm))
 }
