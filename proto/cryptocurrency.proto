@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+option go_package = "/proto/gen/ccpb";
+
+service CryptoCurrency {
+  rpc ListCryptoCurrencys(ListCryptoCurrencysRequest) returns (ListCryptoCurrencysResponse);
+  rpc GetCryptoCurrency(GetCryptoCurrencyRequest) returns (GetCryptoCurrencyResponse);
+  rpc CreateCryptoCurrency(CreateCryptoCurrencyRequest) returns (CreateCryptoCurrencyResponse);
+  rpc UpdateCryptoCurrency(UpdateCryptoCurrencyRequest) returns (UpdateCryptoCurrencyResponse);
+  rpc DeleteCryptoCurrency(DeleteCryptoCurrencyRequest) returns (DeleteCryptoCurrencyResponse);
+  rpc UpVote(UpVoteRequest) returns (UpVoteResponse);
+  rpc DownVote(DownVoteRequest) returns (DownVoteResponse);
+}
+
+message CryptoCurrencyStruct {
+  int64 id = 1;
+  string name = 2;
+  string token = 3;
+  int64 votes = 4;
+}
+
+message ListCryptoCurrencysRequest {}
+
+message ListCryptoCurrencysResponse {
+  repeated CryptoCurrencyStruct cryptocurrency = 1;
+}
+
+message GetCryptoCurrencyRequest {
+  int64 id = 1;
+}
+
+message GetCryptoCurrencyResponse {
+  CryptoCurrencyStruct cryptocurrency = 1;
+}
+
+message CreateCryptoCurrencyRequest {
+  CryptoCurrencyStruct cryptocurrency = 1;
+}
+
+message CreateCryptoCurrencyResponse {
+  CryptoCurrencyStruct cryptocurrency = 1;
+}
+
+message UpdateCryptoCurrencyRequest {
+  CryptoCurrencyStruct cryptocurrency = 1;
+}
+
+message UpdateCryptoCurrencyResponse {
+  CryptoCurrencyStruct cryptocurrency = 1;
+}
+
+message DeleteCryptoCurrencyRequest {
+  int64 id = 1;
+}
+
+message DeleteCryptoCurrencyResponse {
+  bool success = 1;
+}
+
+message UpVoteRequest {
+  CryptoCurrencyStruct cryptocurrency = 2;
+}
+
+message UpVoteResponse {
+  CryptoCurrencyStruct cryptocurrency = 1;
+}
+
+message DownVoteRequest {
+  CryptoCurrencyStruct cryptocurrency = 2;
+}
+
+message DownVoteResponse {
+  CryptoCurrencyStruct cryptocurrency = 1;
+}
