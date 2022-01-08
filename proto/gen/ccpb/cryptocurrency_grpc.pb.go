@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CryptoCurrencyClient interface {
-	ListCryptoCurrencys(ctx context.Context, in *ListCryptoCurrencysRequest, opts ...grpc.CallOption) (*ListCryptoCurrencysResponse, error)
+	GetMostVotedCryptoCurrency(ctx context.Context, in *GetMostVotedCryptoCurrencyRequest, opts ...grpc.CallOption) (*GetMostVotedCryptoCurrencyResponse, error)
 	GetCryptoCurrency(ctx context.Context, in *GetCryptoCurrencyRequest, opts ...grpc.CallOption) (*GetCryptoCurrencyResponse, error)
 	CreateCryptoCurrency(ctx context.Context, in *CreateCryptoCurrencyRequest, opts ...grpc.CallOption) (*CreateCryptoCurrencyResponse, error)
 	UpdateCryptoCurrency(ctx context.Context, in *UpdateCryptoCurrencyRequest, opts ...grpc.CallOption) (*UpdateCryptoCurrencyResponse, error)
@@ -39,9 +39,9 @@ func NewCryptoCurrencyClient(cc grpc.ClientConnInterface) CryptoCurrencyClient {
 	return &cryptoCurrencyClient{cc}
 }
 
-func (c *cryptoCurrencyClient) ListCryptoCurrencys(ctx context.Context, in *ListCryptoCurrencysRequest, opts ...grpc.CallOption) (*ListCryptoCurrencysResponse, error) {
-	out := new(ListCryptoCurrencysResponse)
-	err := c.cc.Invoke(ctx, "/CryptoCurrency/ListCryptoCurrencys", in, out, opts...)
+func (c *cryptoCurrencyClient) GetMostVotedCryptoCurrency(ctx context.Context, in *GetMostVotedCryptoCurrencyRequest, opts ...grpc.CallOption) (*GetMostVotedCryptoCurrencyResponse, error) {
+	out := new(GetMostVotedCryptoCurrencyResponse)
+	err := c.cc.Invoke(ctx, "/CryptoCurrency/GetMostVotedCryptoCurrency", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (c *cryptoCurrencyClient) DownVote(ctx context.Context, in *DownVoteRequest
 // All implementations must embed UnimplementedCryptoCurrencyServer
 // for forward compatibility
 type CryptoCurrencyServer interface {
-	ListCryptoCurrencys(context.Context, *ListCryptoCurrencysRequest) (*ListCryptoCurrencysResponse, error)
+	GetMostVotedCryptoCurrency(context.Context, *GetMostVotedCryptoCurrencyRequest) (*GetMostVotedCryptoCurrencyResponse, error)
 	GetCryptoCurrency(context.Context, *GetCryptoCurrencyRequest) (*GetCryptoCurrencyResponse, error)
 	CreateCryptoCurrency(context.Context, *CreateCryptoCurrencyRequest) (*CreateCryptoCurrencyResponse, error)
 	UpdateCryptoCurrency(context.Context, *UpdateCryptoCurrencyRequest) (*UpdateCryptoCurrencyResponse, error)
@@ -120,8 +120,8 @@ type CryptoCurrencyServer interface {
 type UnimplementedCryptoCurrencyServer struct {
 }
 
-func (UnimplementedCryptoCurrencyServer) ListCryptoCurrencys(context.Context, *ListCryptoCurrencysRequest) (*ListCryptoCurrencysResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListCryptoCurrencys not implemented")
+func (UnimplementedCryptoCurrencyServer) GetMostVotedCryptoCurrency(context.Context, *GetMostVotedCryptoCurrencyRequest) (*GetMostVotedCryptoCurrencyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMostVotedCryptoCurrency not implemented")
 }
 func (UnimplementedCryptoCurrencyServer) GetCryptoCurrency(context.Context, *GetCryptoCurrencyRequest) (*GetCryptoCurrencyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCryptoCurrency not implemented")
@@ -154,20 +154,20 @@ func RegisterCryptoCurrencyServer(s grpc.ServiceRegistrar, srv CryptoCurrencySer
 	s.RegisterService(&CryptoCurrency_ServiceDesc, srv)
 }
 
-func _CryptoCurrency_ListCryptoCurrencys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListCryptoCurrencysRequest)
+func _CryptoCurrency_GetMostVotedCryptoCurrency_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMostVotedCryptoCurrencyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CryptoCurrencyServer).ListCryptoCurrencys(ctx, in)
+		return srv.(CryptoCurrencyServer).GetMostVotedCryptoCurrency(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/CryptoCurrency/ListCryptoCurrencys",
+		FullMethod: "/CryptoCurrency/GetMostVotedCryptoCurrency",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CryptoCurrencyServer).ListCryptoCurrencys(ctx, req.(*ListCryptoCurrencysRequest))
+		return srv.(CryptoCurrencyServer).GetMostVotedCryptoCurrency(ctx, req.(*GetMostVotedCryptoCurrencyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -288,8 +288,8 @@ var CryptoCurrency_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CryptoCurrencyServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListCryptoCurrencys",
-			Handler:    _CryptoCurrency_ListCryptoCurrencys_Handler,
+			MethodName: "GetMostVotedCryptoCurrency",
+			Handler:    _CryptoCurrency_GetMostVotedCryptoCurrency_Handler,
 		},
 		{
 			MethodName: "GetCryptoCurrency",

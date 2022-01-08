@@ -20,10 +20,10 @@ func NewCryptoCurrency(l *log.Logger) *Server {
 	return &Server{l, ccpb.UnimplementedCryptoCurrencyServer{}}
 }
 
-func (s *Server) ListCryptoCurrencys(ctx context.Context, r *ccpb.ListCryptoCurrencysRequest) (*ccpb.ListCryptoCurrencysResponse, error) {
-	s.l.Printf("[CRYPTOCURRENCY] ListCryptoCurrencys: %s", r)
+func (s *Server) GetMostVotedCryptoCurrency(ctx context.Context, r *ccpb.GetMostVotedCryptoCurrencyRequest) (*ccpb.GetMostVotedCryptoCurrencyResponse, error) {
+	s.l.Printf("[CRYPTOCURRENCY] GetMostVotedCryptoCurrency: %s", r)
 
-	return &ccpb.ListCryptoCurrencysResponse{}, nil
+	return &ccpb.GetMostVotedCryptoCurrencyResponse{}, nil
 }
 
 func (s *Server) GetCryptoCurrency(ctx context.Context, r *ccpb.GetCryptoCurrencyRequest) (*ccpb.GetCryptoCurrencyResponse, error) {

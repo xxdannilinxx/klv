@@ -12,25 +12,28 @@ import (
 )
 
 type config struct {
-	PORT         string
-	DATABASE_URL string
+	PORT              string
+	POSTGRES_USER     string
+	POSTGRES_PASSWORD string
+	POSTGRES_DB       string
 }
 
 var Config config
 
-// testes
+// bson
 // fazer repository de alguma forma que de pra trocar o banco
+// a regra de negocio fica no repository
+
+// testes
+// readme
+// comentarios
 func main() {
 	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
 
 	Config.PORT = os.Getenv("PORT")
-	if Config.PORT == "" {
-		l.Fatal("[MAIN] Unspecified port")
-	}
-	Config.DATABASE_URL = os.Getenv("DATABASE_URL")
-	if Config.DATABASE_URL == "" {
-		l.Fatal("[MAIN] Unspecified database connection.")
-	}
+	Config.POSTGRES_USER = os.Getenv("POSTGRES_USER")
+	Config.POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
+	Config.POSTGRES_DB = os.Getenv("POSTGRES_DB")
 
 	lis, err := net.Listen("tcp", ":"+Config.PORT)
 	if err != nil {

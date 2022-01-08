@@ -3,7 +3,7 @@ syntax = "proto3";
 option go_package = "/proto/gen/ccpb";
 
 service CryptoCurrency {
-  rpc ListCryptoCurrencys(ListCryptoCurrencysRequest) returns (ListCryptoCurrencysResponse);
+  rpc GetMostVotedCryptoCurrency(GetMostVotedCryptoCurrencyRequest) returns (GetMostVotedCryptoCurrencyResponse);
   rpc GetCryptoCurrency(GetCryptoCurrencyRequest) returns (GetCryptoCurrencyResponse);
   rpc CreateCryptoCurrency(CreateCryptoCurrencyRequest) returns (CreateCryptoCurrencyResponse);
   rpc UpdateCryptoCurrency(UpdateCryptoCurrencyRequest) returns (UpdateCryptoCurrencyResponse);
@@ -19,9 +19,9 @@ message CryptoCurrencyStruct {
   int64 votes = 4;
 }
 
-message ListCryptoCurrencysRequest {}
+message GetMostVotedCryptoCurrencyRequest {}
 
-message ListCryptoCurrencysResponse {
+message GetMostVotedCryptoCurrencyResponse {
   repeated CryptoCurrencyStruct cryptocurrency = 1;
 }
 
