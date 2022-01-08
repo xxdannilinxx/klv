@@ -1,12 +1,16 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"net"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/xxdannilinxx/klv/cryptocurrency"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
+	"github.com/xxdannilinxx/klv/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -16,13 +20,11 @@ type config struct {
 	POSTGRES_USER     string
 	POSTGRES_PASSWORD string
 	POSTGRES_DB       string
+	POSTGRES_HOST     string
+	POSTGRES_PORT     string
 }
 
 var Config config
-
-// bson
-// fazer repository de alguma forma que de pra trocar o banco
-// a regra de negocio fica no repository
 
 // testes
 // readme
@@ -34,13 +36,22 @@ func main() {
 	Config.POSTGRES_USER = os.Getenv("POSTGRES_USER")
 	Config.POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
 	Config.POSTGRES_DB = os.Getenv("POSTGRES_DB")
+	Config.POSTGRES_HOST = os.Getenv("POSTGRES_HOST")
+	Config.POSTGRES_PORT = os.Getenv("POSTGRES_PORT")
 
-	lis, err := net.Listen("tcp", ":"+Config.PORT)
-	if err != nil {
-		log.Fatalf("[MAIN] Failed to listen: %v.", err)
-	}
+	psglconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", Config.POSTGRES_HOST, Config.POSTGRES_PORT, Config.POSTGRES_USER, Config.POSTGRES_PASSWORD, Config.POSTGRES_DB)
+	db, err := sql.Open("postgres", psglconn)
+	utils.CheckError(err)
 
-	cc := cryptocurrency.NewCryptoCurrency(l)
+	defer db.Close()
+
+	err = db.Ping()
+	utils.CheckError(err)
+
+	listener, err := net.Listen("tcp", ":"+Config.PORT)
+	utils.CheckError(err)
+
+	cc := cryptocurrency.NewCryptoCurrency(l, db)
 	grpcServer := grpc.NewServer()
 
 	ccpb.RegisterCryptoCurrencyServer(grpcServer, cc)
@@ -48,8 +59,6 @@ func main() {
 
 	l.Printf("[MAIN] Server online in port %s.", Config.PORT)
 
-	if err := grpcServer.Serve(lis); err != nil {
-		l.Fatalf("[MAIN] Failed to serve: %s.", err)
-	}
-
+	err = grpcServer.Serve(listener)
+	utils.CheckError(err)
 }

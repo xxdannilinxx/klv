@@ -1,10 +1,12 @@
 package cryptocurrency
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
+	"github.com/xxdannilinxx/klv/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -12,12 +14,13 @@ import (
 )
 
 type Server struct {
-	l *log.Logger
+	l  *log.Logger
+	db *sql.DB
 	ccpb.UnimplementedCryptoCurrencyServer
 }
 
-func NewCryptoCurrency(l *log.Logger) *Server {
-	return &Server{l, ccpb.UnimplementedCryptoCurrencyServer{}}
+func NewCryptoCurrency(l *log.Logger, db *sql.DB) *Server {
+	return &Server{l, db, ccpb.UnimplementedCryptoCurrencyServer{}}
 }
 
 func (s *Server) GetMostVotedCryptoCurrency(ctx context.Context, r *ccpb.GetMostVotedCryptoCurrencyRequest) (*ccpb.GetMostVotedCryptoCurrencyResponse, error) {
@@ -32,30 +35,53 @@ func (s *Server) GetCryptoCurrency(ctx context.Context, r *ccpb.GetCryptoCurrenc
 	return &ccpb.GetCryptoCurrencyResponse{}, nil
 }
 
+// This function is used for create a new cryptocurrency
+//
+// Example of call:
+// grpcurl -plaintext --msg-template -d '{ "cryptocurrency": { "name": "Klever", "token": "KLV" } }' localhost:8090 CryptoCurrency.CreateCryptoCurrency
 func (s *Server) CreateCryptoCurrency(ctx context.Context, r *ccpb.CreateCryptoCurrencyRequest) (*ccpb.CreateCryptoCurrencyResponse, error) {
 	s.l.Printf("[CRYPTOCURRENCY] CreateCryptoCurrency: %s", r)
 
-	cr := &CryptoCurrency{
-		Id:    r.Cryptocurrency.Id,
-		Name:  r.Cryptocurrency.Name,
-		Token: r.Cryptocurrency.Token,
-		Votes: r.Cryptocurrency.Votes,
+	crypto := r.GetCryptocurrency()
+
+	cc := &CryptoCurrency{
+		Id:    0,
+		Name:  crypto.GetName(),
+		Token: crypto.GetToken(),
 	}
 
-	err := cr.Validate()
+	err := cc.Validate()
 	if err != nil {
 		return nil, status.Errorf(
 			codes.Internal,
-			fmt.Sprintf("[CRYPTOCURRENCY] Internal error: %v.", err),
+			fmt.Sprintf("[CRYPTOCURRENCY] Internal server error: %v.", err),
 		)
 	}
 
-	return &ccpb.CreateCryptoCurrencyResponse{Cryptocurrency: &ccpb.CryptoCurrencyStruct{
-		Id:    cr.Id,
-		Name:  cr.Name,
-		Token: cr.Token,
-		Votes: cr.Votes,
-	}}, nil
+	//
+	//
+	//
+	rows, err := s.db.Query(`SELECT "name" FROM "cryptocurrencies"`)
+	utils.CheckError(err)
+
+	defer rows.Close()
+	for rows.Next() {
+		var name string
+
+		err = rows.Scan(&name)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(name)
+	}
+	//
+	//
+	//
+
+	crypto.Id = 10
+	crypto.Votes = 100
+	return &ccpb.CreateCryptoCurrencyResponse{Cryptocurrency: crypto}, nil
 }
 
 func (s *Server) UpdateCryptoCurrency(ctx context.Context, r *ccpb.UpdateCryptoCurrencyRequest) (*ccpb.UpdateCryptoCurrencyResponse, error) {

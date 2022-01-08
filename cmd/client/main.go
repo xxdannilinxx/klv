@@ -14,7 +14,7 @@ func main() {
 	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
 
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":8080", grpc.WithInsecure())
+	conn, err := grpc.Dial(":8090", grpc.WithInsecure())
 
 	if err != nil {
 		log.Fatalf("[CLIENT] Did not connect: %s.", err)

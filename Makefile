@@ -7,7 +7,7 @@ build:
 	@protoc --go_out=plugins=grpc:. *.proto
 
 run_server:
-	@PORT=8090 POSTGRES_USER="admin" POSTGRES_PASSWORD="admin" POSTGRES_DB="klv" go run cmd/server/main.go
+	@PORT=8090 POSTGRES_USER="admin" POSTGRES_PASSWORD="admin" POSTGRES_DB="klv" POSTGRES_HOST="localhost" POSTGRES_PORT="5432" go run cmd/server/main.go
 
 run_client:
 	@go run cmd/client/main.go

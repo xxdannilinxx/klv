@@ -18,3 +18,5 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: klv
+      POSTGRES_HOST: "localhost"
+      POSTGRES_PORT: "5432"

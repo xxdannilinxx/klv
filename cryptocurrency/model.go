@@ -8,7 +8,7 @@ type CryptoCurrency struct {
 	Id    int64  `json:"id" bson:"id"`
 	Name  string `json:"name" bson:"name" validate:"required"`
 	Token string `json:"token" bson:"token" validate:"required"`
-	Votes int64  `json:"votes" bson:"votes" validate:"required"`
+	Votes int64  `json:"votes" bson:"votes"`
 }
 
 func (c *CryptoCurrency) Validate() error {

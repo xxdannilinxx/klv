@@ -4,8 +4,8 @@ CREATE SEQUENCE cryptocurrencies_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 21474836
 
 CREATE TABLE "public"."cryptocurrencies" (
     "id" integer DEFAULT nextval('cryptocurrencies_id_seq') NOT NULL,
-    "name" varchar(100) NOT NULL,
-    "token" varchar(10) NOT NULL,
+    "name" varchar(100) NOT NULL UNIQUE,
+    "token" varchar(10) NOT NULL UNIQUE,
     "votes" numeric DEFAULT '0' NOT NULL,
     CONSTRAINT "cryptocurrencies_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
