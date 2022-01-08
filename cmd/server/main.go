@@ -20,9 +20,6 @@ var Config config
 
 // testes
 // fazer repository de alguma forma que de pra trocar o banco
-// passar logger por referencia
-// exemplos de chamada usando grpcurl
-// criar dto?
 func main() {
 	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
 
@@ -40,10 +37,10 @@ func main() {
 		log.Fatalf("[MAIN] Failed to listen: %v.", err)
 	}
 
-	cc := cryptocurrency.Server{}
+	cc := cryptocurrency.NewCryptoCurrency(l)
 	grpcServer := grpc.NewServer()
 
-	ccpb.RegisterCryptoCurrencyServer(grpcServer, &cc)
+	ccpb.RegisterCryptoCurrencyServer(grpcServer, cc)
 	reflection.Register(grpcServer)
 
 	l.Printf("[MAIN] Server online in port %s.", Config.PORT)

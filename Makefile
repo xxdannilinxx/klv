@@ -12,5 +12,16 @@ run_server:
 run_client:
 	@go run cmd/client/main.go
 
+test_cov:
+	@go test -cover -coverprofile=c.out ./...
+	@go tool cover -html=c.out -o coverage.html
+
+test_benchmark:
+	@go test -bench=. ./...
+
+test_doc:
+	@go get golang.org/x/tools/cmd/godoc
+	@godoc -play -http=:6060
+
 request:
 	@grpcurl -plaintext --msg-template -d '{}' localhost:8080 CryptoCurrency.ListCryptoCurrencys

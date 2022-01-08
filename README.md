@@ -1,21 +1,17 @@
 # klv
-app test for klv;
+The Technical Challenge consists of creating an API with Golang using gRPC with stream pipes that exposes an Upvote service endpoints. The API will provide the user an interface to upvote or downvote a known list of the main Cryptocurrencies (Bitcoin, ethereum, litecoin, etc..).
 
-# run project
-``$ go mod vendor``
+# tecnologias
 
-``$ go run ./cmd/server/main.go --PORT 8080``
-# run tests coverage
-``$ go test -cover -coverprofile=c.out ./...``
+# requisitos
 
-``$ go tool cover -html=c.out -o coverage.html``
+# como iniciar ou com docker
 
-# run tests benchmark
-``$ go test -bench=. ./...``
+# exemplos de curl
 
-# run doc
-``$ go get golang.org/x/tools/cmd/godoc``
-``$ godoc -play -http=:6060``
+# scripts
+estão no makefile
 
-# run in heroku
-https://db-postgre-dev.herokuapp.com/
+# documentação com godocs
+
+# testes

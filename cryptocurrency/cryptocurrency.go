@@ -1,103 +1,83 @@
 package cryptocurrency
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
 
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"golang.org/x/net/context"
 )
 
 type Server struct {
+	l *log.Logger
 	ccpb.UnimplementedCryptoCurrencyServer
 }
 
+func NewCryptoCurrency(l *log.Logger) *Server {
+	return &Server{l, ccpb.UnimplementedCryptoCurrencyServer{}}
+}
+
 func (s *Server) ListCryptoCurrencys(ctx context.Context, r *ccpb.ListCryptoCurrencysRequest) (*ccpb.ListCryptoCurrencysResponse, error) {
-	log.Printf("Receive message from client: %s", r)
+	s.l.Printf("[CRYPTOCURRENCY] ListCryptoCurrencys: %s", r)
 
 	return &ccpb.ListCryptoCurrencysResponse{}, nil
 }
 
 func (s *Server) GetCryptoCurrency(ctx context.Context, r *ccpb.GetCryptoCurrencyRequest) (*ccpb.GetCryptoCurrencyResponse, error) {
-	log.Printf("Receive message from client: %s", r)
+	s.l.Printf("[CRYPTOCURRENCY] GetCryptoCurrency: %s", r)
 
 	return &ccpb.GetCryptoCurrencyResponse{}, nil
 }
 
 func (s *Server) CreateCryptoCurrency(ctx context.Context, r *ccpb.CreateCryptoCurrencyRequest) (*ccpb.CreateCryptoCurrencyResponse, error) {
-	log.Printf("Receive message from client: %s", r)
+	s.l.Printf("[CRYPTOCURRENCY] CreateCryptoCurrency: %s", r)
 
-	// passar log pra cá
-
-	var body []byte
-	err := json.Unmarshal(body, r)
-	if err != nil {
-		log.Println("ERROR ", err)
+	cr := &CryptoCurrency{
+		Id:    r.Cryptocurrency.Id,
+		Name:  r.Cryptocurrency.Name,
+		Token: r.Cryptocurrency.Token,
+		Votes: r.Cryptocurrency.Votes,
 	}
 
-	// err = cur.Validate()
-	// if err != nil {
-	// 	log.Println("[CURRENCY] ERROR ", err)
-	// 	return
-	// }
+	err := cr.Validate()
+	if err != nil {
+		return nil, status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("[CRYPTOCURRENCY] Internal error: %v.", err),
+		)
+	}
 
-	return &ccpb.CreateCryptoCurrencyResponse{}, nil
+	return &ccpb.CreateCryptoCurrencyResponse{Cryptocurrency: &ccpb.CryptoCurrencyStruct{
+		Id:    cr.Id,
+		Name:  cr.Name,
+		Token: cr.Token,
+		Votes: cr.Votes,
+	}}, nil
 }
 
 func (s *Server) UpdateCryptoCurrency(ctx context.Context, r *ccpb.UpdateCryptoCurrencyRequest) (*ccpb.UpdateCryptoCurrencyResponse, error) {
-	log.Printf("Receive message from client: %s", r)
+	s.l.Printf("[CRYPTOCURRENCY] UpdateCryptoCurrency: %s", r)
 
 	return &ccpb.UpdateCryptoCurrencyResponse{}, nil
 }
 
 func (s *Server) DeleteCryptoCurrency(ctx context.Context, r *ccpb.DeleteCryptoCurrencyRequest) (*ccpb.DeleteCryptoCurrencyResponse, error) {
-	log.Printf("Receive message from client: %s", r)
+	s.l.Printf("[CRYPTOCURRENCY] DeleteCryptoCurrency: %s", r)
 
 	return &ccpb.DeleteCryptoCurrencyResponse{}, nil
 }
 
 func (s *Server) UpVote(ctx context.Context, r *ccpb.UpVoteRequest) (*ccpb.UpVoteResponse, error) {
-	log.Printf("Receive message from client: %s", r)
+	s.l.Printf("[CRYPTOCURRENCY] UpVote: %s", r)
 
 	return &ccpb.UpVoteResponse{}, nil
 }
 
 func (s *Server) DownVote(ctx context.Context, r *ccpb.DownVoteRequest) (*ccpb.DownVoteResponse, error) {
-	log.Printf("Receive message from client: %s", r)
+	s.l.Printf("[CRYPTOCURRENCY] DownVote: %s", r)
 
 	return &ccpb.DownVoteResponse{}, nil
 }
-
-// log.Printf("Receive message from client: %s", in.Username)
-
-// 	res, err := http.Get(fmt.Sprintf("https://api.github.com/users/%v", in.Username))
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	body, readErr := ioutil.ReadAll(res.Body)
-// 	if readErr != nil {
-// 		log.Fatal(readErr)
-// 	}
-
-// 	usr := User{}
-// 	jsonErr := json.Unmarshal(body, &usr)
-// 	if jsonErr != nil {
-// 		log.Fatal(jsonErr)
-// 	}
-
-// 	return &user.UserResponse{
-// 		Id:        usr.ID,
-// 		Name:      usr.Name,
-// 		Username:  usr.Username,
-// 		Avatarurl: usr.AvatarURL,
-// 		Location:  usr.Location,
-// 		Statistics: &user.Statistics{
-// 			Followers: usr.Followers,
-// 			Following: usr.Following,
-// 			Repos:     usr.Repos,
-// 			Gists:     usr.Gists,
-// 		},
-// 		ListURLs: []string{usr.URL, usr.StarredURL, usr.ReposURL},
-// 	}, nil
