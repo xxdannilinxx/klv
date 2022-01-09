@@ -26,9 +26,6 @@ type config struct {
 
 var Config config
 
-// testes
-// readme
-// comentarios
 func main() {
 	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
 

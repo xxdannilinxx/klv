@@ -22,7 +22,7 @@ message CryptoCurrencyStruct {
 message GetMostVotedCryptoCurrencyRequest {}
 
 message GetMostVotedCryptoCurrencyResponse {
-  repeated CryptoCurrencyStruct cryptocurrency = 1;
+  CryptoCurrencyStruct cryptocurrency = 1;
 }
 
 message GetCryptoCurrencyRequest {
@@ -58,17 +58,17 @@ message DeleteCryptoCurrencyResponse {
 }
 
 message UpVoteRequest {
-  CryptoCurrencyStruct cryptocurrency = 2;
+  int64 id = 1;
 }
 
 message UpVoteResponse {
-  CryptoCurrencyStruct cryptocurrency = 1;
+  bool success = 1;
 }
 
 message DownVoteRequest {
-  CryptoCurrencyStruct cryptocurrency = 2;
+  int64 id = 1;
 }
 
 message DownVoteResponse {
-  CryptoCurrencyStruct cryptocurrency = 1;
+  bool success = 1;
 }

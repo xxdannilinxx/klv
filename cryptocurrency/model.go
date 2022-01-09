@@ -5,10 +5,10 @@ import (
 )
 
 type CryptoCurrency struct {
-	Id    int64  `json:"id" bson:"id"`
-	Name  string `json:"name" bson:"name" validate:"required"`
-	Token string `json:"token" bson:"token" validate:"required"`
-	Votes int64  `json:"votes" bson:"votes"`
+	Id    int64  `json:"id" bson:"id" db:"id"`
+	Name  string `json:"name" bson:"name" db:"name" validate:"required"`
+	Token string `json:"token" bson:"token" db:"token" validate:"required"`
+	Votes int64  `json:"votes" bson:"votes" db:"votes"`
 }
 
 func (c *CryptoCurrency) Validate() error {

@@ -8,17 +8,16 @@ import (
 	"google.golang.org/grpc"
 
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
+	"github.com/xxdannilinxx/klv/utils"
 )
 
 func main() {
-	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
+	l := log.New(os.Stdout, "klv-client - ", log.LstdFlags)
 
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(":8090", grpc.WithInsecure())
+	utils.CheckError(err)
 
-	if err != nil {
-		log.Fatalf("[CLIENT] Did not connect: %s.", err)
-	}
 	defer conn.Close()
 
 	cc := ccpb.NewCryptoCurrencyClient(conn)
