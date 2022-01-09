@@ -11,6 +11,7 @@ type CryptoCurrency struct {
 	Votes int64  `json:"votes" bson:"votes" db:"votes"`
 }
 
+// Validate cryptocurrency structure
 func (c *CryptoCurrency) Validate() error {
 	validate := validator.New()
 	return validate.Struct(c)

@@ -1,7 +1,6 @@
 package cryptocurrency
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -14,13 +13,14 @@ import (
 )
 
 type Server struct {
-	l  *log.Logger
-	db *sql.DB
+	l          *log.Logger
+	repository *CryptoCurrencyRepository
 	ccpb.UnimplementedCryptoCurrencyServer
 }
 
-func NewCryptoCurrency(l *log.Logger, db *sql.DB) *Server {
-	return &Server{l, db, ccpb.UnimplementedCryptoCurrencyServer{}}
+// New cryptocurrency module office
+func NewCryptoCurrency(l *log.Logger, repository *CryptoCurrencyRepository) *Server {
+	return &Server{l, repository, ccpb.UnimplementedCryptoCurrencyServer{}}
 }
 
 // This function is used for return most voted cryptocurrency
@@ -30,8 +30,7 @@ func NewCryptoCurrency(l *log.Logger, db *sql.DB) *Server {
 func (s *Server) GetMostVotedCryptoCurrency(ctx context.Context, r *ccpb.GetMostVotedCryptoCurrencyRequest) (*ccpb.GetMostVotedCryptoCurrencyResponse, error) {
 	s.l.Printf("[CRYPTOCURRENCY] GetMostVotedCryptoCurrency: %s", r)
 
-	repository := &CryptoCurrencyRepository{s.db}
-	crypto, err := repository.GetMostVoted()
+	crypto, err := s.repository.GetMostVoted()
 	if err != nil {
 		return nil, status.Errorf(
 			codes.NotFound,
@@ -59,8 +58,7 @@ func (s *Server) GetCryptoCurrency(ctx context.Context, r *ccpb.GetCryptoCurrenc
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("[CRYPTOCURRENCY] Invalid field validation: %s", err))
 	}
 
-	repository := &CryptoCurrencyRepository{s.db}
-	crypto, err := repository.Get(r.Id)
+	crypto, err := s.repository.GetById(r.Id)
 
 	if err != nil {
 		return nil, status.Errorf(
@@ -97,8 +95,7 @@ func (s *Server) CreateCryptoCurrency(ctx context.Context, r *ccpb.CreateCryptoC
 		)
 	}
 
-	repository := &CryptoCurrencyRepository{s.db}
-	crypto, err = repository.Insert(crypto)
+	crypto, err = s.repository.Save(crypto)
 	if err != nil {
 		return nil, status.Errorf(
 			codes.Internal,
@@ -135,8 +132,7 @@ func (s *Server) UpdateCryptoCurrency(ctx context.Context, r *ccpb.UpdateCryptoC
 		)
 	}
 
-	repository := &CryptoCurrencyRepository{s.db}
-	crypto, err = repository.Update(crypto)
+	crypto, err = s.repository.Update(crypto)
 	if err != nil {
 		return nil, status.Errorf(
 			codes.Internal,
@@ -164,8 +160,7 @@ func (s *Server) DeleteCryptoCurrency(ctx context.Context, r *ccpb.DeleteCryptoC
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("[CRYPTOCURRENCY] Invalid field validation: %s", err))
 	}
 
-	repository := &CryptoCurrencyRepository{s.db}
-	_, err = repository.Delete(r.Id)
+	_, err = s.repository.Delete(r.Id)
 
 	if err != nil {
 		return nil, status.Errorf(
@@ -189,8 +184,7 @@ func (s *Server) UpVote(ctx context.Context, r *ccpb.UpVoteRequest) (*ccpb.UpVot
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("[CRYPTOCURRENCY] Invalid field validation: %s", err))
 	}
 
-	repository := &CryptoCurrencyRepository{s.db}
-	_, err = repository.UpVote(r.Id)
+	_, err = s.repository.UpVote(r.Id)
 
 	if err != nil {
 		return nil, status.Errorf(
@@ -214,8 +208,7 @@ func (s *Server) DownVote(ctx context.Context, r *ccpb.DownVoteRequest) (*ccpb.D
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("[CRYPTOCURRENCY] Invalid field validation: %s", err))
 	}
 
-	repository := &CryptoCurrencyRepository{s.db}
-	_, err = repository.DownVote(r.Id)
+	_, err = s.repository.DownVote(r.Id)
 
 	if err != nil {
 		return nil, status.Errorf(

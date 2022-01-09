@@ -11,6 +11,7 @@ import (
 	"github.com/xxdannilinxx/klv/utils"
 )
 
+// Examples of server calls
 func main() {
 	l := log.New(os.Stdout, "klv-client - ", log.LstdFlags)
 
