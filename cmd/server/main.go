@@ -5,7 +5,6 @@ import (
 	"net"
 	"os"
 
-	_ "github.com/lib/pq"
 	"github.com/xxdannilinxx/klv/cryptocurrency"
 	"github.com/xxdannilinxx/klv/db"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
@@ -15,19 +14,19 @@ import (
 )
 
 var (
-	Config utils.Config
+	Config utils.Config = utils.Config{
+		PORT:              os.Getenv("PORT"),
+		POSTGRES_USER:     os.Getenv("POSTGRES_USER"),
+		POSTGRES_PASSWORD: os.Getenv("POSTGRES_PASSWORD"),
+		POSTGRES_DB:       os.Getenv("POSTGRES_DB"),
+		POSTGRES_HOST:     os.Getenv("POSTGRES_HOST"),
+		POSTGRES_PORT:     os.Getenv("POSTGRES_PORT"),
+	}
 )
 
 // Role responsible for uploading the server and connecting to the database
 func main() {
 	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
-
-	Config.PORT = os.Getenv("PORT")
-	Config.POSTGRES_USER = os.Getenv("POSTGRES_USER")
-	Config.POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
-	Config.POSTGRES_DB = os.Getenv("POSTGRES_DB")
-	Config.POSTGRES_HOST = os.Getenv("POSTGRES_HOST")
-	Config.POSTGRES_PORT = os.Getenv("POSTGRES_PORT")
 
 	db := db.ConnectDB(Config)
 

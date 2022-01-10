@@ -24,4 +24,4 @@ test_doc:
 	@godoc -play -http=:6060
 
 request:
-	@grpcurl -plaintext --msg-template -d '{}' localhost:8080 CryptoCurrency.ListCryptoCurrencys
+	@grpcurl -plaintext -d '' localhost:8090 CryptoCurrency.GetMostVotedCryptoCurrency

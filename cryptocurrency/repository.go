@@ -102,7 +102,7 @@ func (r *CryptoCurrencyRepository) Delete(id int64) (*CryptoCurrency, error) {
 		return crypto, err
 	}
 
-	query := fmt.Sprintf(`DELETE FROM "cryptocurrencies" WHERE "id" = $1;`, tableName)
+	query := fmt.Sprintf(`DELETE FROM "%s" WHERE "id" = $1;`, tableName)
 	_, err = r.db.Exec(query, id)
 
 	return crypto, err
@@ -118,7 +118,7 @@ func (r *CryptoCurrencyRepository) UpVote(id int64) (*CryptoCurrency, error) {
 		return crypto, err
 	}
 
-	query := fmt.Sprintf(`UPDATE "cryptocurrencies" SET "votes" = "votes" + 1 WHERE "id" = $1;`, tableName)
+	query := fmt.Sprintf(`UPDATE "%s" SET "votes" = "votes" + 1 WHERE "id" = $1;`, tableName)
 	_, err = r.db.Exec(query, id)
 
 	return crypto, err
