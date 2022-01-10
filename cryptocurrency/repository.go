@@ -85,8 +85,8 @@ func (r *CryptoCurrencyRepository) Update(cc *CryptoCurrency) (*CryptoCurrency, 
 		return crypto, err
 	}
 
-	query := fmt.Sprintf(`UPDATE "%s" SET "name" = $1, "token" = $2;`, tableName)
-	_, err = r.db.Exec(query, cc.Name, cc.Token)
+	query := fmt.Sprintf(`UPDATE "%s" SET "name" = $2, "token" = $3 WHERE "id" = $1;`, tableName)
+	_, err = r.db.Exec(query, cc.Id, cc.Name, cc.Token)
 	crypto = cc
 
 	return crypto, err

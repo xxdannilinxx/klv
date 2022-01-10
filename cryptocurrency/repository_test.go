@@ -1,6 +1,7 @@
 package cryptocurrency
 
 import (
+	"database/sql"
 	"fmt"
 	"math/rand"
 	"os"
@@ -24,16 +25,20 @@ var (
 )
 
 var (
-	fakeCrypto *CryptoCurrency = &CryptoCurrency{
-		Name:  fmt.Sprintf("Klever%d", rand.Intn(99999)),
-		Token: fmt.Sprintf("KLV%d", rand.Intn(99999)),
-	}
+	DbConn     *sql.DB                   = db.ConnectDB(Config)
+	Repository *CryptoCurrencyRepository = NewCryptoCurrencyRepository(DbConn)
+	fakeCrypto *CryptoCurrency           = GenerateFakeCrypto("REPO")
 )
 
+func GenerateFakeCrypto(id string) *CryptoCurrency {
+	return &CryptoCurrency{
+		Name:  fmt.Sprintf("%s%d", id, rand.Intn(99999)),
+		Token: fmt.Sprintf("%s%d", id, rand.Intn(99999)),
+	}
+}
+
 func TestSave(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	result, err := repository.Save(fakeCrypto)
+	result, err := Repository.Save(fakeCrypto)
 
 	fakeCrypto = result
 
@@ -43,9 +48,7 @@ func TestSave(t *testing.T) {
 }
 
 func TestSaveDuplicate(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	_, err := repository.Save(fakeCrypto)
+	_, err := Repository.Save(fakeCrypto)
 
 	pqErr := err.(*pq.Error)
 
@@ -54,9 +57,7 @@ func TestSaveDuplicate(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	result, err := repository.Update(fakeCrypto)
+	result, err := Repository.Update(fakeCrypto)
 
 	fakeCrypto = result
 
@@ -66,9 +67,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestUpdateNotExists(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	_, err := repository.Update(&CryptoCurrency{
+	_, err := Repository.Update(&CryptoCurrency{
 		Name:  fakeCrypto.Name,
 		Token: fakeCrypto.Token,
 	})
@@ -78,9 +77,7 @@ func TestUpdateNotExists(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	result, err := repository.GetById(fakeCrypto.Id)
+	result, err := Repository.GetById(fakeCrypto.Id)
 
 	fakeCrypto = result
 
@@ -90,9 +87,7 @@ func TestGetById(t *testing.T) {
 }
 
 func TestGetMostVoted(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	result, err := repository.GetMostVoted()
+	result, err := Repository.GetMostVoted()
 
 	cryptoMostVoted := result
 
@@ -102,9 +97,7 @@ func TestGetMostVoted(t *testing.T) {
 }
 
 func TestUpVote(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	result, err := repository.UpVote(fakeCrypto.Id)
+	result, err := Repository.UpVote(fakeCrypto.Id)
 
 	fakeCrypto = result
 
@@ -114,9 +107,7 @@ func TestUpVote(t *testing.T) {
 }
 
 func DownVote(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	result, err := repository.DownVote(fakeCrypto.Id)
+	result, err := Repository.DownVote(fakeCrypto.Id)
 
 	fakeCrypto = result
 
@@ -126,9 +117,7 @@ func DownVote(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	result, err := repository.Delete(fakeCrypto.Id)
+	result, err := Repository.Delete(fakeCrypto.Id)
 
 	fakeCrypto = result
 
@@ -136,13 +125,11 @@ func TestDelete(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Nil(t, fakeCrypto.Validate())
 
-	fakeCrypto = &CryptoCurrency{}
+	fakeCrypto = GenerateFakeCrypto("REPO")
 }
 
 func TestAllMethodsDependsGetById(t *testing.T) {
-	db := db.ConnectDB(Config)
-	repository := NewCryptoCurrencyRepository(db)
-	_, err := repository.GetById(0)
+	_, err := Repository.GetById(0)
 
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "sql: no rows in result set")
