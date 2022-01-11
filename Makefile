@@ -28,4 +28,4 @@ grpc_ui:
 	@grpcui -plaintext localhost:${PORT}
 
 request:
-	@grpcurl -plaintext -d '' localhost:8090 CryptoCurrency.GetMostVotedCryptoCurrency
+	@grpcurl -plaintext -d '' localhost:${PORT} CryptoCurrency.GetMostVotedCryptoCurrency

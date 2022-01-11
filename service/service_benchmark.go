@@ -1,4 +1,4 @@
-package cryptocurrency
+package service
 
 import (
 	"log"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/xxdannilinxx/klv/pgsql"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
+	"github.com/xxdannilinxx/klv/repository"
 	"github.com/xxdannilinxx/klv/utils"
 	"golang.org/x/net/context"
 )
@@ -26,7 +27,7 @@ func BenchmarkGetMostVotedCryptoCurrency(b *testing.B) {
 	l := log.New(os.Stdout, "klv-api-benchmark - ", log.LstdFlags)
 
 	dbConn := pgsql.ConnectDB(config)
-	repository := NewCryptoCurrencyRepository(dbConn)
+	repository := repository.NewCryptoCurrencyRepository(dbConn)
 	s := NewCryptoCurrencyService(l, repository)
 
 	for i := 0; i < b.N; i++ {

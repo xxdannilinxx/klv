@@ -1,4 +1,4 @@
-package cryptocurrency
+package entity
 
 import (
 	"github.com/go-playground/validator"

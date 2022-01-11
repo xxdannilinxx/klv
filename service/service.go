@@ -1,10 +1,14 @@
-package cryptocurrency
+package service
 
 import (
 	"fmt"
 	"log"
 
+	"github.com/xxdannilinxx/klv/entity"
+	_ "github.com/xxdannilinxx/klv/entity"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
+	"github.com/xxdannilinxx/klv/repository"
+	_ "github.com/xxdannilinxx/klv/repository"
 	"github.com/xxdannilinxx/klv/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -24,12 +28,12 @@ type CryptoCurrencyService interface {
 
 type Server struct {
 	l          *log.Logger
-	repository CryptoCurrencyRepository
+	repository repository.CryptoCurrencyRepository
 	ccpb.UnimplementedCryptoCurrencyServer
 }
 
 // New cryptocurrency module office
-func NewCryptoCurrencyService(l *log.Logger, repository CryptoCurrencyRepository) *Server {
+func NewCryptoCurrencyService(l *log.Logger, repository repository.CryptoCurrencyRepository) *Server {
 	return &Server{l, repository, ccpb.UnimplementedCryptoCurrencyServer{}}
 }
 
@@ -92,7 +96,7 @@ func (s *Server) GetCryptoCurrency(ctx context.Context, r *ccpb.GetCryptoCurrenc
 func (s *Server) CreateCryptoCurrency(ctx context.Context, r *ccpb.CreateCryptoCurrencyRequest) (*ccpb.CreateCryptoCurrencyResponse, error) {
 	s.l.Printf("[CRYPTOCURRENCY] CreateCryptoCurrency: %s", r)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Name:  r.Cryptocurrency.Name,
 		Token: r.Cryptocurrency.Token,
 	}
@@ -128,7 +132,7 @@ func (s *Server) CreateCryptoCurrency(ctx context.Context, r *ccpb.CreateCryptoC
 func (s *Server) UpdateCryptoCurrency(ctx context.Context, r *ccpb.UpdateCryptoCurrencyRequest) (*ccpb.UpdateCryptoCurrencyResponse, error) {
 	s.l.Printf("[CRYPTOCURRENCY] UpdateCryptoCurrency: %s", r)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Id:    r.Cryptocurrency.Id,
 		Name:  r.Cryptocurrency.Name,
 		Token: r.Cryptocurrency.Token,

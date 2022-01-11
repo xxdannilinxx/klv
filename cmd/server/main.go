@@ -6,9 +6,10 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/xxdannilinxx/klv/cryptocurrency"
 	"github.com/xxdannilinxx/klv/pgsql"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
+	"github.com/xxdannilinxx/klv/repository"
+	"github.com/xxdannilinxx/klv/service"
 	"github.com/xxdannilinxx/klv/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -39,8 +40,8 @@ func main() {
 	listener, err := net.Listen("tcp", ":"+Config.PORT)
 	utils.CheckError(err)
 
-	ccRepository := cryptocurrency.NewCryptoCurrencyRepository(dbConn)
-	cc := cryptocurrency.NewCryptoCurrencyService(l, ccRepository)
+	ccRepository := repository.NewCryptoCurrencyRepository(dbConn)
+	cc := service.NewCryptoCurrencyService(l, ccRepository)
 	grpcServer := grpc.NewServer()
 
 	ccpb.RegisterCryptoCurrencyServer(grpcServer, cc)

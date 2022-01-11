@@ -1,12 +1,15 @@
-package cryptocurrency
+package service
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/xxdannilinxx/klv/entity"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
 	"golang.org/x/net/context"
 )
@@ -15,45 +18,52 @@ type MockRepository struct {
 	mock.Mock
 }
 
-func (mock *MockRepository) GetMostVoted() (*CryptoCurrency, error) {
-	args := mock.Called()
-	result := args.Get(0)
-	return result.(*CryptoCurrency), args.Error(1)
+func GenerateFakeCrypto(id string) *entity.CryptoCurrency {
+	return &entity.CryptoCurrency{
+		Name:  fmt.Sprintf("%s%d", id, rand.Intn(99999)),
+		Token: fmt.Sprintf("%s%d", id, rand.Intn(99999)),
+	}
 }
 
-func (mock *MockRepository) GetById(id int64) (*CryptoCurrency, error) {
+func (mock *MockRepository) GetMostVoted() (*entity.CryptoCurrency, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*CryptoCurrency), args.Error(1)
+	return result.(*entity.CryptoCurrency), args.Error(1)
 }
 
-func (mock *MockRepository) Save(cc *CryptoCurrency) (*CryptoCurrency, error) {
+func (mock *MockRepository) GetById(id int64) (*entity.CryptoCurrency, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*CryptoCurrency), args.Error(1)
+	return result.(*entity.CryptoCurrency), args.Error(1)
 }
 
-func (mock *MockRepository) Update(cc *CryptoCurrency) (*CryptoCurrency, error) {
+func (mock *MockRepository) Save(cc *entity.CryptoCurrency) (*entity.CryptoCurrency, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*CryptoCurrency), args.Error(1)
+	return result.(*entity.CryptoCurrency), args.Error(1)
 }
 
-func (mock *MockRepository) Delete(id int64) (*CryptoCurrency, error) {
+func (mock *MockRepository) Update(cc *entity.CryptoCurrency) (*entity.CryptoCurrency, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*CryptoCurrency), args.Error(1)
+	return result.(*entity.CryptoCurrency), args.Error(1)
 }
 
-func (mock *MockRepository) UpVote(id int64) (*CryptoCurrency, error) {
+func (mock *MockRepository) Delete(id int64) (*entity.CryptoCurrency, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*CryptoCurrency), args.Error(1)
+	return result.(*entity.CryptoCurrency), args.Error(1)
 }
-func (mock *MockRepository) DownVote(id int64) (*CryptoCurrency, error) {
+
+func (mock *MockRepository) UpVote(id int64) (*entity.CryptoCurrency, error) {
 	args := mock.Called()
 	result := args.Get(0)
-	return result.(*CryptoCurrency), args.Error(1)
+	return result.(*entity.CryptoCurrency), args.Error(1)
+}
+func (mock *MockRepository) DownVote(id int64) (*entity.CryptoCurrency, error) {
+	args := mock.Called()
+	result := args.Get(0)
+	return result.(*entity.CryptoCurrency), args.Error(1)
 }
 
 var (
@@ -65,7 +75,7 @@ func TestGetMostVotedCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Name:  fakeCryptoService.Name,
 		Token: fakeCryptoService.Token,
 	}
@@ -83,7 +93,7 @@ func TestGetCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Id:    1,
 		Name:  fakeCryptoService.Name,
 		Token: fakeCryptoService.Token,
@@ -105,7 +115,7 @@ func TestCreateCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Name:  fakeCryptoService.Name,
 		Token: fakeCryptoService.Token,
 		Votes: 0,
@@ -129,7 +139,7 @@ func TestCreateInvalidCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Name:  "",
 		Token: "",
 		Votes: 0,
@@ -150,7 +160,7 @@ func TestUpdateCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Name:  fakeCryptoService.Name,
 		Token: fakeCryptoService.Token,
 		Votes: 0,
@@ -174,7 +184,7 @@ func TestDeleteCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Id:    1,
 		Name:  fakeCryptoService.Name,
 		Token: fakeCryptoService.Token,
@@ -194,7 +204,7 @@ func TestDeleteEmptyCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Id:    0,
 		Name:  fakeCryptoService.Name,
 		Token: fakeCryptoService.Token,
@@ -213,7 +223,7 @@ func TestUpVoteCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Id:    1,
 		Name:  fakeCryptoService.Name,
 		Token: fakeCryptoService.Token,
@@ -233,7 +243,7 @@ func TestDownVoteCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
 
-	crypto := &CryptoCurrency{
+	crypto := &entity.CryptoCurrency{
 		Id:    1,
 		Name:  fakeCryptoService.Name,
 		Token: fakeCryptoService.Token,
