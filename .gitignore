@@ -16,4 +16,5 @@
 vendor/
 
 # Others
+.vscode/
 coverage.html

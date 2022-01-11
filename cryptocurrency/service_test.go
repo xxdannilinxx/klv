@@ -125,6 +125,27 @@ func TestCreateCryptoCurrency(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestCreateInvalidCryptoCurrency(t *testing.T) {
+	mockRepo := new(MockRepository)
+	s := NewCryptoCurrencyService(l, mockRepo)
+
+	crypto := &CryptoCurrency{
+		Name:  "",
+		Token: "",
+		Votes: 0,
+	}
+	mockRepo.On("Save").Return(crypto, nil)
+
+	_, err := s.CreateCryptoCurrency(context.Background(), &ccpb.CreateCryptoCurrencyRequest{
+		Cryptocurrency: &ccpb.CryptoCurrencyStruct{
+			Name:  crypto.Name,
+			Token: crypto.Token,
+		},
+	})
+
+	assert.NotNil(t, err)
+}
+
 func TestUpdateCryptoCurrency(t *testing.T) {
 	mockRepo := new(MockRepository)
 	s := NewCryptoCurrencyService(l, mockRepo)
@@ -167,6 +188,25 @@ func TestDeleteCryptoCurrency(t *testing.T) {
 
 	assert.True(t, resp.Success)
 	assert.Nil(t, err)
+}
+
+func TestDeleteEmptyCryptoCurrency(t *testing.T) {
+	mockRepo := new(MockRepository)
+	s := NewCryptoCurrencyService(l, mockRepo)
+
+	crypto := &CryptoCurrency{
+		Id:    0,
+		Name:  fakeCryptoService.Name,
+		Token: fakeCryptoService.Token,
+		Votes: 0,
+	}
+	mockRepo.On("Delete").Return(crypto, nil)
+
+	_, err := s.DeleteCryptoCurrency(context.Background(), &ccpb.DeleteCryptoCurrencyRequest{
+		Id: crypto.Id,
+	})
+
+	assert.NotNil(t, err)
 }
 
 func TestUpVoteCryptoCurrency(t *testing.T) {
