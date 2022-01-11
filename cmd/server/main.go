@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/xxdannilinxx/klv/cryptocurrency"
 	"github.com/xxdannilinxx/klv/pgsql"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
@@ -14,7 +15,17 @@ import (
 )
 
 var (
-	Config utils.Config = utils.Config{
+	Config utils.Config
+)
+
+// Role responsible for uploading the server and connecting to the database
+func main() {
+	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
+
+	err := godotenv.Load(".env")
+	utils.CheckError(err)
+
+	Config = utils.Config{
 		PORT:              os.Getenv("PORT"),
 		POSTGRES_USER:     os.Getenv("POSTGRES_USER"),
 		POSTGRES_PASSWORD: os.Getenv("POSTGRES_PASSWORD"),
@@ -22,11 +33,6 @@ var (
 		POSTGRES_HOST:     os.Getenv("POSTGRES_HOST"),
 		POSTGRES_PORT:     os.Getenv("POSTGRES_PORT"),
 	}
-)
-
-// Role responsible for uploading the server and connecting to the database
-func main() {
-	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
 
 	dbConn := pgsql.ConnectDB(Config)
 

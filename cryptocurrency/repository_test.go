@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/xxdannilinxx/klv/pgsql"
@@ -14,14 +15,7 @@ import (
 )
 
 var (
-	Config utils.Config = utils.Config{
-		PORT:              os.Getenv("PORT"),
-		POSTGRES_USER:     os.Getenv("POSTGRES_USER"),
-		POSTGRES_PASSWORD: os.Getenv("POSTGRES_PASSWORD"),
-		POSTGRES_DB:       os.Getenv("POSTGRES_DB"),
-		POSTGRES_HOST:     os.Getenv("POSTGRES_HOST"),
-		POSTGRES_PORT:     os.Getenv("POSTGRES_PORT"),
-	}
+	Config utils.Config
 )
 
 var (
@@ -31,6 +25,18 @@ var (
 )
 
 func GenerateFakeCrypto(id string) *CryptoCurrency {
+	err := godotenv.Load(".env")
+	utils.CheckError(err)
+
+	Config = utils.Config{
+		PORT:              os.Getenv("PORT"),
+		POSTGRES_USER:     os.Getenv("POSTGRES_USER"),
+		POSTGRES_PASSWORD: os.Getenv("POSTGRES_PASSWORD"),
+		POSTGRES_DB:       os.Getenv("POSTGRES_DB"),
+		POSTGRES_HOST:     os.Getenv("POSTGRES_HOST"),
+		POSTGRES_PORT:     os.Getenv("POSTGRES_PORT"),
+	}
+
 	return &CryptoCurrency{
 		Name:  fmt.Sprintf("%s%d", id, rand.Intn(99999)),
 		Token: fmt.Sprintf("%s%d", id, rand.Intn(99999)),
