@@ -1,4 +1,4 @@
-package db
+package pgsql
 
 import (
 	"os"
@@ -20,7 +20,7 @@ var (
 )
 
 func TestConnecDB(t *testing.T) {
-	db := ConnectDB(Config)
-	err := db.Ping()
+	dbConn := ConnectDB(Config)
+	err := dbConn.Ping()
 	assert.Nil(t, err)
 }

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/xxdannilinxx/klv/db"
+	"github.com/xxdannilinxx/klv/pgsql"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
 	"github.com/xxdannilinxx/klv/utils"
 	"golang.org/x/net/context"
@@ -25,9 +25,9 @@ var (
 func BenchmarkGetMostVotedCryptoCurrency(b *testing.B) {
 	l := log.New(os.Stdout, "klv-api-benchmark - ", log.LstdFlags)
 
-	dbConn := db.ConnectDB(config)
-	repository := &CryptoCurrencyRepository{dbConn}
-	s := NewCryptoCurrency(l, repository)
+	dbConn := pgsql.ConnectDB(config)
+	repository := NewCryptoCurrencyRepository(dbConn)
+	s := NewCryptoCurrencyService(l, repository)
 
 	for i := 0; i < b.N; i++ {
 		s.GetMostVotedCryptoCurrency(context.Background(), &ccpb.GetMostVotedCryptoCurrencyRequest{})

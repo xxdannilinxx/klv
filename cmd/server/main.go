@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/xxdannilinxx/klv/cryptocurrency"
-	"github.com/xxdannilinxx/klv/db"
+	"github.com/xxdannilinxx/klv/pgsql"
 	ccpb "github.com/xxdannilinxx/klv/proto/gen/ccpb"
 	"github.com/xxdannilinxx/klv/utils"
 	"google.golang.org/grpc"
@@ -28,13 +28,13 @@ var (
 func main() {
 	l := log.New(os.Stdout, "klv-api - ", log.LstdFlags)
 
-	db := db.ConnectDB(Config)
+	dbConn := pgsql.ConnectDB(Config)
 
 	listener, err := net.Listen("tcp", ":"+Config.PORT)
 	utils.CheckError(err)
 
-	ccRepository := cryptocurrency.NewCryptoCurrencyRepository(db)
-	cc := cryptocurrency.NewCryptoCurrency(l, ccRepository)
+	ccRepository := cryptocurrency.NewCryptoCurrencyRepository(dbConn)
+	cc := cryptocurrency.NewCryptoCurrencyService(l, ccRepository)
 	grpcServer := grpc.NewServer()
 
 	ccpb.RegisterCryptoCurrencyServer(grpcServer, cc)

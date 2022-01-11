@@ -9,7 +9,7 @@ import (
 
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
-	"github.com/xxdannilinxx/klv/db"
+	"github.com/xxdannilinxx/klv/pgsql"
 	"github.com/xxdannilinxx/klv/utils"
 )
 
@@ -25,9 +25,9 @@ var (
 )
 
 var (
-	DbConn     *sql.DB                   = db.ConnectDB(Config)
-	Repository *CryptoCurrencyRepository = NewCryptoCurrencyRepository(DbConn)
-	fakeCrypto *CryptoCurrency           = GenerateFakeCrypto("REPO")
+	dbConn               *sql.DB                  = pgsql.ConnectDB(Config)
+	repository           CryptoCurrencyRepository = NewCryptoCurrencyRepository(dbConn)
+	fakeCryptoRepository *CryptoCurrency          = GenerateFakeCrypto("REPO")
 )
 
 func GenerateFakeCrypto(id string) *CryptoCurrency {
@@ -38,17 +38,17 @@ func GenerateFakeCrypto(id string) *CryptoCurrency {
 }
 
 func TestSave(t *testing.T) {
-	result, err := Repository.Save(fakeCrypto)
+	result, err := repository.Save(fakeCryptoRepository)
 
-	fakeCrypto = result
+	fakeCryptoRepository = result
 
 	assert.NotNil(t, result)
 	assert.Nil(t, err)
-	assert.Nil(t, fakeCrypto.Validate())
+	assert.Nil(t, fakeCryptoRepository.Validate())
 }
 
 func TestSaveDuplicate(t *testing.T) {
-	_, err := Repository.Save(fakeCrypto)
+	_, err := repository.Save(fakeCryptoRepository)
 
 	pqErr := err.(*pq.Error)
 
@@ -57,19 +57,19 @@ func TestSaveDuplicate(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	result, err := Repository.Update(fakeCrypto)
+	result, err := repository.Update(fakeCryptoRepository)
 
-	fakeCrypto = result
+	fakeCryptoRepository = result
 
 	assert.NotNil(t, result)
 	assert.Nil(t, err)
-	assert.Nil(t, fakeCrypto.Validate())
+	assert.Nil(t, fakeCryptoRepository.Validate())
 }
 
 func TestUpdateNotExists(t *testing.T) {
-	_, err := Repository.Update(&CryptoCurrency{
-		Name:  fakeCrypto.Name,
-		Token: fakeCrypto.Token,
+	_, err := repository.Update(&CryptoCurrency{
+		Name:  fakeCryptoRepository.Name,
+		Token: fakeCryptoRepository.Token,
 	})
 
 	assert.NotNil(t, err)
@@ -77,17 +77,17 @@ func TestUpdateNotExists(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
-	result, err := Repository.GetById(fakeCrypto.Id)
+	result, err := repository.GetById(fakeCryptoRepository.Id)
 
-	fakeCrypto = result
+	fakeCryptoRepository = result
 
 	assert.NotNil(t, result)
 	assert.Nil(t, err)
-	assert.Nil(t, fakeCrypto.Validate())
+	assert.Nil(t, fakeCryptoRepository.Validate())
 }
 
 func TestGetMostVoted(t *testing.T) {
-	result, err := Repository.GetMostVoted()
+	result, err := repository.GetMostVoted()
 
 	cryptoMostVoted := result
 
@@ -97,39 +97,39 @@ func TestGetMostVoted(t *testing.T) {
 }
 
 func TestUpVote(t *testing.T) {
-	result, err := Repository.UpVote(fakeCrypto.Id)
+	result, err := repository.UpVote(fakeCryptoRepository.Id)
 
-	fakeCrypto = result
+	fakeCryptoRepository = result
 
 	assert.NotNil(t, result)
 	assert.Nil(t, err)
-	assert.Nil(t, fakeCrypto.Validate())
+	assert.Nil(t, fakeCryptoRepository.Validate())
 }
 
 func DownVote(t *testing.T) {
-	result, err := Repository.DownVote(fakeCrypto.Id)
+	result, err := repository.DownVote(fakeCryptoRepository.Id)
 
-	fakeCrypto = result
+	fakeCryptoRepository = result
 
 	assert.NotNil(t, result)
 	assert.Nil(t, err)
-	assert.Nil(t, fakeCrypto.Validate())
+	assert.Nil(t, fakeCryptoRepository.Validate())
 }
 
 func TestDelete(t *testing.T) {
-	result, err := Repository.Delete(fakeCrypto.Id)
+	result, err := repository.Delete(fakeCryptoRepository.Id)
 
-	fakeCrypto = result
+	fakeCryptoRepository = result
 
 	assert.NotNil(t, result)
 	assert.Nil(t, err)
-	assert.Nil(t, fakeCrypto.Validate())
+	assert.Nil(t, fakeCryptoRepository.Validate())
 
-	fakeCrypto = GenerateFakeCrypto("REPO")
+	fakeCryptoRepository = GenerateFakeCrypto("REPO")
 }
 
 func TestAllMethodsDependsGetById(t *testing.T) {
-	_, err := Repository.GetById(0)
+	_, err := repository.GetById(0)
 
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "sql: no rows in result set")

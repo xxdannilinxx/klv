@@ -12,14 +12,24 @@ import (
 	"golang.org/x/net/context"
 )
 
+type CryptoCurrencyService interface {
+	GetMostVotedCryptoCurrency(ctx context.Context, r *ccpb.GetMostVotedCryptoCurrencyRequest) (*ccpb.GetMostVotedCryptoCurrencyResponse, error)
+	GetCryptoCurrency(ctx context.Context, r *ccpb.GetCryptoCurrencyRequest) (*ccpb.GetCryptoCurrencyResponse, error)
+	CreateCryptoCurrency(ctx context.Context, r *ccpb.CreateCryptoCurrencyRequest) (*ccpb.CreateCryptoCurrencyResponse, error)
+	UpdateCryptoCurrency(ctx context.Context, r *ccpb.UpdateCryptoCurrencyRequest) (*ccpb.UpdateCryptoCurrencyResponse, error)
+	DeleteCryptoCurrency(ctx context.Context, r *ccpb.DeleteCryptoCurrencyRequest) (*ccpb.DeleteCryptoCurrencyResponse, error)
+	UpVote(ctx context.Context, r *ccpb.UpVoteRequest) (*ccpb.UpVoteResponse, error)
+	DownVote(ctx context.Context, r *ccpb.DownVoteRequest) (*ccpb.DownVoteResponse, error)
+}
+
 type Server struct {
 	l          *log.Logger
-	repository *CryptoCurrencyRepository
+	repository CryptoCurrencyRepository
 	ccpb.UnimplementedCryptoCurrencyServer
 }
 
 // New cryptocurrency module office
-func NewCryptoCurrency(l *log.Logger, repository *CryptoCurrencyRepository) *Server {
+func NewCryptoCurrencyService(l *log.Logger, repository CryptoCurrencyRepository) *Server {
 	return &Server{l, repository, ccpb.UnimplementedCryptoCurrencyServer{}}
 }
 
